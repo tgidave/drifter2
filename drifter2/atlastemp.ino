@@ -1,5 +1,5 @@
 #include "drifter2.h"
-#include "tempsensor.h"
+#include "atlastemp.h"
 
 float currentTemp = 0;
 

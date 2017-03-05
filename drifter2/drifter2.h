@@ -18,7 +18,7 @@
 
 #define OUTBUFFER_SIZE  340
 
-//#define ALWAYS_TRANSMIT
+#define ALWAYS_TRANSMIT
 //#define NEVER_TRANSMIT
 
 #define TRANSMIT_HOUR_1 0

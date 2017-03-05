@@ -19,7 +19,7 @@
 #include <Time.h>
 #include <TimeAlarms.h>
 
-#include "tempsensor.h"
+#include "atlastemp.h"
 #include "gps.h"
 #include "imu.h"
 #include "rockblock.h"
@@ -68,7 +68,9 @@ time_t getTeensy3Time() {
 
 void setup() {
 
-  firstTimeAfterReset = true;
+  firstTimeAfterReset = false;
+//  firstTimeAfterReset = true;
+
   pinMode(GPS_POWER_PIN, OUTPUT);
   digitalWrite(GPS_POWER_PIN, LOW);
   pinMode(ROCKBLOCK_POWER_PIN, OUTPUT);
