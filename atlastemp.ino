@@ -3,7 +3,7 @@
 
 float currentTemp = 0;
 
-void initializeTemp(void) {
+void atlasIinitializeTemp(void) {
   int timeoutCount;
   String tempString = "";
 
@@ -89,7 +89,7 @@ void initializeTemp(void) {
 }
 
 
-float getCurrentTemp(void) {
+float atlasGetCurrentTemp(void) {
 
   int retryCount = 0;
   String tempString = "";

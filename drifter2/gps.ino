@@ -13,7 +13,7 @@ int getGPSFix(void) {
   int fixfnd = false;
   unsigned long now;
 //  time_t GPSTime;
-  int notAvailableCount;
+//  int notAvailableCount;
   char outBuffer[OUTBUFFER_SIZE];
 
   loopStartTime = millis();
@@ -40,68 +40,8 @@ int getGPSFix(void) {
     }
   }
 
-//#ifdef SERIAL_DEBUG_GPS
-//  if (fixfnd) {
-//    DEBUG_SERIAL.println("fix found");
-//  } else {
-//    DEBUG_SERIAL.println("fix not found");
-//  }
-//#endif
+#ifdef SERIAL_DEBUG_GPS
   if (fixfnd) {
-/*
-    teensyTimeElements.Year =   dateYear =   tinygps.date.year();
-    teensyTimeElements.Year -= 1970;
-    teensyTimeElements.Month =  dateMonth =  tinygps.date.month();
-    teensyTimeElements.Day =    dateDay =    tinygps.date.day();
-    teensyTimeElements.Hour =   timeHour =   tinygps.time.hour();
-    teensyTimeElements.Minute = timeMinute = tinygps.time.minute();
-    teensyTimeElements.Second = timeSecond = tinygps.time.second();
-
-    GPSTime = makeTime(teensyTimeElements);
-    Teensy3Clock.set(GPSTime);
-    setTime(GPSTime);
-#ifdef SERIAL_DEBUG_TIME
-    debugClockDisplay();
-#endif
-    latitude = tinygps.location.lat();
-    longitude = tinygps.location.lng();
-
-#ifndef ALTITUDE_ARRAY
-    altitude = tinygps.altitude.meters();
-#endif
-
-    speed = tinygps.speed.knots();
-    course = tinygps.course.value() / 100;
-    notAvailableCount = 0;
-
-#ifdef ALTITUDE_ARRAY
-    for (i = 0; i < WAVE_COUNT;) {
-      if (GPS_SERIAL.available()) {
-        tinygps.encode(GPS_SERIAL.read());
-        waveData[i] = tinygps.altitude.meters();
-        ++i;
-        notAvailableCount = 0;
-      } else {
-        ++notAvailableCount;
-        if (notAvailableCount >= 3) {
-          waveData[i] = 0;
-          notAvailableCount = 0;
-          ++i;
-#ifdef SERIAL_DEBUG_GPS
-          DEBUG_SERIAL.print("notAvailableCount = 3\r\n");
-#endif
-        }
-      }
-
-#ifdef SERIAL_DEBUG_GPS
-      sprintf(outBuffer, "i = %d %d\r\n", i, notAvailableCount);
-      DEBUG_SERIAL.print(outBuffer);
-#endif
-      delay(1000);
-    }
-#endif
-*/
-#ifdef SERIAL_DEBUG_GPS
     *outBuffer = 0;
     PString str(outBuffer, OUTBUFFER_SIZE);
     str.print("fix found! ");
@@ -116,23 +56,7 @@ int getGPSFix(void) {
     str.print(tinygps.course.value() / 100);
     str.print("\r\n");
     DEBUG_SERIAL.print(outBuffer);
-/*
-#ifdef ALTITUDE_ARRAY
-    str.begin();
-
-    for (i = 0; i < WAVE_COUNT - 1; ++i) {
-      str.print(waveData[i], 2);
-      str.print(", ");
-    }
-
-    str.print(waveData[i], 2);
-    str.print("\r\n");
-#endif
-*/
-#endif
-  }
-#ifdef SERIAL_DEBUG_GPS
-    else {
+  } else {
       DEBUG_SERIAL.print("No fix found.\r\n");
   }
 #endif
@@ -185,3 +109,6 @@ float gpsGetSpeed(void) {
 float gpsGetCourse(void) {
   return(tinygps.course.deg());
 }
+
+
+

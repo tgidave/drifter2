@@ -1,7 +1,7 @@
 
 #include <Adafruit_Sensor.h>
-#include <Adafruit_BNO055.h>
-#include <utility/imumaths.h>
+#include "Adafruit_BNO055.h"
+#include "imumaths.h"
 
 #include "imu.h"
 #include "drifter2.h"
@@ -52,3 +52,6 @@ imuVect * getIMUPosition(void) {
 void imuPowerDown(void) {
   digitalWrite(IMU_POWER_PIN, LOW);
 }
+
+
+

@@ -1,15 +1,16 @@
+
 //*****************************************************************************
 //
 // drifter2.ino
 //
 // This is the code for the main processor of the drifter2 device.  This code
-// sleeps for an hour in low power mode and then wakes up and takes a GPS 
+// sleeps for an hour in low power mode and then wakes up and takes a GPS
 // reading getting the date, time, location, speed, vector, and altitude.
-// The altitude may to sampled for a number of time to detect wave data.  The 
+// The altitude may to sampled for a number of time to detect wave data.  The
 // color of the sky may also be recorded.  This data is collected in the drifter
-// data structure.  At certain hours during the day the drifter data structure 
-// is transmitted back to the user using the Iridium system.  The system then 
-// goes back to sleep for an hour.  
+// data structure.  At certain hours during the day the drifter data structure
+// is transmitted back to the user using the Iridium system.  The system then
+// goes back to sleep for an hour.
 //
 //*****************************************************************************
 
@@ -19,7 +20,10 @@
 #include <Time.h>
 #include <TimeAlarms.h>
 
-#include "atlastemp.h"
+#include <i2c_t3.h>
+
+//#include "atlastemp.h"
+#include "brtemp.h"
 #include "gps.h"
 #include "imu.h"
 #include "rockblock.h"
@@ -77,19 +81,22 @@ void setup() {
   digitalWrite(ROCKBLOCK_POWER_PIN, LOW);
   pinMode(IMU_POWER_PIN, OUTPUT);
   digitalWrite(IMU_POWER_PIN, LOW);
+  pinMode(TEMP_POWER_PIN, OUTPUT);
+  digitalWrite(TEMP_POWER_PIN, LOW);
 
   // set the Time library to use Teensy 3.0's RTC to keep time
   setSyncProvider(getTeensy3Time);
+
+  Wire.begin();
 
 #ifdef SERIAL_DEBUG
   // Start the serial ports
   DEBUG_SERIAL.begin(DEBUG_BAUD);
   delay(1000);
   DEBUG_SERIAL.print("Debugging start.\r\n");
-  debugClockDisplay();
 #endif
 
-  initializeTemp();
+//    initializeTemp();
 }
 
 void loop() {
@@ -98,9 +105,13 @@ void loop() {
   int fixFound;
   time_t GPSTime;
   time_t nextTime;
-  imuVect *vectPtr;
+  imuVect* vectPtr;
   noFixFoundCount = 0;
 //  *outBuffer = 0;
+
+#ifdef SERIAL_DEBUG_TIME
+  debugClockDisplay();
+#endif
 
   if ((fixFound = getGPSFix()) == true) {
     teensyTimeElements.Year =   ddData.ddYear =   gpsGetYear();
@@ -113,7 +124,7 @@ void loop() {
 
     GPSTime = makeTime(teensyTimeElements);
     Teensy3Clock.set(GPSTime);
-    setTime(GPSTime);
+    setTime(GPSTime); 
 #ifdef SERIAL_DEBUG_TIME
     debugClockDisplay();
 #endif
@@ -129,7 +140,15 @@ void loop() {
     ++noFixFoundCount;
   }
 
-  ddData.ddTemperature = getCurrentTemp();
+  brIinitializeTemp();
+  ddData.ddTemperature = brGetCurrentTemp();
+  brShutdownTemp();
+
+#ifdef SERIAL_DEBUG_IMU
+  DEBUG_SERIAL.print("Temperature = ");
+  DEBUG_SERIAL.print(ddData.ddTemperature);
+  DEBUG_SERIAL.print("\r\n");
+#endif
 
   if (imuPowerUp() == 0) {
 
@@ -143,14 +162,14 @@ void loop() {
       ddData.ddVect[i].roll = vectPtr->roll;
       delay(BNO055_SAMPLERATE_DELAY_MS);
     }
-  } 
+  }
 
 #ifdef SERIAL_DEBUG_IMU
-  else {
+else {
     DEBUG_SERIAL.print("No BNO055 detected ... Check your wiring or I2C ADDR!\r\n");
   }
 #endif
-  
+
   imuPowerDown();
 
 #ifdef SERIAL_DEBUG
@@ -163,29 +182,29 @@ void loop() {
   if (firstTimeAfterReset) {
     firstTimeAfterReset = false;
   } else {
-  #ifdef ALWAYS_TRANSMIT
+#ifdef ALWAYS_TRANSMIT
     transmitGPSFix(&ddData, sizeof(ddData));
-  #else
-    #ifndef NEVER_TRANSMIT
+#else
+#ifndef NEVER_TRANSMIT
     // If the time is right, send the data back home using the Iritium system.
     if ((hour() == TRANSMIT_HOUR_1) ||
         (hour() == TRANSMIT_HOUR_2) ||
-        (hour() == TRANSMIT_HOUR_3) || 
+        (hour() == TRANSMIT_HOUR_3) ||
         (hour() == TRANSMIT_HOUR_4)) {
       transmitGPSFix(&ddData, sizeof(ddData));
     }
-    #endif
-  #endif
+#endif
+#endif
   }
 
   DEBUG_SERIAL.print(minute());
 
-  if((nextTime = 30 - minute()) <= 0) {
+  if ((nextTime = 30 - minute()) <= 0) {
     nextTime += 60;
   }
 
-  alarm.setAlarm(0, nextTime, 0);// hour, min, sec
-  
+  alarm.setAlarm(0, nextTime, 0); // hour, min, sec
+
 #ifdef SERIAL_DEBUG
   DEBUG_SERIAL.print("Will sleep for ");
   DEBUG_SERIAL.print(nextTime);
@@ -193,6 +212,8 @@ void loop() {
   DEBUG_SERIAL.flush();
 #endif
 
-  Snooze.hibernate( config_teensy35 );// return module that woke processor
+  Snooze.hibernate(config_teensy35); // return module that woke processor
 }
+
+
 

@@ -6,3 +6,6 @@
 #define TEMP_BAUD 9600
 #define TEMP_POWER_PIN 30
 
+void atlasIinitializeTemp(void);
+float atlasGetCurrentTemp(void);
+

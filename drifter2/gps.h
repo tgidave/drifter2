@@ -21,3 +21,6 @@ float gpsGetSpeed(void);
 float gpsGetCourse(void);
 
 #endif
+
+
+
