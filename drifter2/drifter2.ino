@@ -35,9 +35,6 @@ unsigned long loopStartTime;
 
 static TimeElements teensyTimeElements;
 
-//static int timeToWakeup;
-//static AlarmId wakeupId;
-
 drifterData ddData;
 
 SnoozeAlarm	alarm;
@@ -57,15 +54,6 @@ void debugClockDisplay() {
 }
 #endif
 
-//void AlarmOnceOnly() {
-//  timeToWakeup = true;
-//#ifdef SERIAL_DEBUG
-//  DEBUG_SERIAL.println("Time to wake up!\r\n");
-//#endif
-//  Alarm.free(wakeupId);
-//  wakeupId = dtINVALID_ALARM_ID;
-//}
-
 time_t getTeensy3Time() {
   return Teensy3Clock.get();
 }
@@ -73,14 +61,16 @@ time_t getTeensy3Time() {
 void setup() {
 
   firstTimeAfterReset = false;
-//  firstTimeAfterReset = true;
-
+ 
   pinMode(GPS_POWER_PIN, OUTPUT);
   digitalWrite(GPS_POWER_PIN, LOW);
+
   pinMode(ROCKBLOCK_POWER_PIN, OUTPUT);
   digitalWrite(ROCKBLOCK_POWER_PIN, LOW);
+
   pinMode(IMU_POWER_PIN, OUTPUT);
   digitalWrite(IMU_POWER_PIN, LOW);
+
   pinMode(TEMP_POWER_PIN, OUTPUT);
   digitalWrite(TEMP_POWER_PIN, LOW);
 
@@ -96,7 +86,6 @@ void setup() {
   DEBUG_SERIAL.print("Debugging start.\r\n");
 #endif
 
-//    initializeTemp();
 }
 
 void loop() {
@@ -107,13 +96,14 @@ void loop() {
   time_t nextTime;
   imuVect* vectPtr;
   noFixFoundCount = 0;
-//  *outBuffer = 0;
 
 #ifdef SERIAL_DEBUG_TIME
   debugClockDisplay();
 #endif
+  
+//  fixFound = getGPSFix();
 
-  if ((fixFound = getGPSFix()) == true) {
+  if (fixFound == true) {
     teensyTimeElements.Year =   ddData.ddYear =   gpsGetYear();
     teensyTimeElements.Year -= 1970;
     teensyTimeElements.Month =  ddData.ddMonth =  gpsGetMonth();
@@ -140,9 +130,9 @@ void loop() {
     ++noFixFoundCount;
   }
 
-  brIinitializeTemp();
-  ddData.ddTemperature = brGetCurrentTemp();
-  brShutdownTemp();
+//  brIinitializeTemp();
+//  ddData.ddTemperature = brGetCurrentTemp();
+//  brShutdownTemp();
 
 #ifdef SERIAL_DEBUG_IMU
   DEBUG_SERIAL.print("Temperature = ");
@@ -196,8 +186,6 @@ else {
 #endif
 #endif
   }
-
-  DEBUG_SERIAL.print(minute());
 
   if ((nextTime = 30 - minute()) <= 0) {
     nextTime += 60;
