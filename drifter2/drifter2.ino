@@ -101,7 +101,7 @@ void loop() {
   debugClockDisplay();
 #endif
   
-//  fixFound = getGPSFix();
+  fixFound = getGPSFix();
 
   if (fixFound == true) {
     teensyTimeElements.Year =   ddData.ddYear =   gpsGetYear();
