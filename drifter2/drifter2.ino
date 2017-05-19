@@ -60,7 +60,7 @@ time_t getTeensy3Time() {
 
 void setup() {
 
-  firstTimeAfterReset = false;
+  firstTimeAfterReset = true;
  
   pinMode(GPS_POWER_PIN, OUTPUT);
   digitalWrite(GPS_POWER_PIN, LOW);
