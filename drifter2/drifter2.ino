@@ -5,10 +5,10 @@
 //
 // This is the code for the main processor of the drifter2 device.  This code
 // sleeps for an hour in low power mode and then wakes up and takes a GPS
-// reading getting the date, time, location, speed, vector, and altitude.
-// The altitude may to sampled for a number of time to detect wave data.  The
-// color of the sky may also be recorded.  This data is collected in the drifter
-// data structure.  At certain hours during the day the drifter data structure
+// reading getting the date, time, and location.  The temperature is retrieved 
+// from the temp sensor.  The yawn, roll, and Z axis acceleration is gathered 
+// from the IMU.  All his data is collected in the drifter data structure.  
+// At certain hours during the day the drifter data structure
 // is transmitted back to the user using the Iridium system.  The system then
 // goes back to sleep for an hour.
 //
@@ -130,9 +130,9 @@ void loop() {
     ++noFixFoundCount;
   }
 
-//  brIinitializeTemp();
-//  ddData.ddTemperature = brGetCurrentTemp();
-//  brShutdownTemp();
+  brIinitializeTemp();
+  ddData.ddTemperature = brGetCurrentTemp();
+  brShutdownTemp();
 
 #ifdef SERIAL_DEBUG_IMU
   DEBUG_SERIAL.print("Temperature = ");
@@ -155,7 +155,7 @@ void loop() {
   }
 
 #ifdef SERIAL_DEBUG_IMU
-else {
+  else {
     DEBUG_SERIAL.print("No BNO055 detected ... Check your wiring or I2C ADDR!\r\n");
   }
 #endif
@@ -200,7 +200,7 @@ else {
   DEBUG_SERIAL.flush();
 #endif
 
-  Snooze.hibernate(config_teensy35); // return module that woke processor
+  Snooze.hibernate(config_teensy35); // Sleep for an hour
 }
 
 
