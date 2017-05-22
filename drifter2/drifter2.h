@@ -1,7 +1,7 @@
 #ifndef DRIFTER2_H
   #define DRIFTER2_H
 
-//#define SERIAL_DEBUG
+#define SERIAL_DEBUG
 
 #ifdef SERIAL_DEBUG
   #define SERIAL_DEBUG_TIME
@@ -26,6 +26,13 @@
 #define TRANSMIT_HOUR_3 12
 #define TRANSMIT_HOUR_4 18
 
+typedef struct motionVect{
+  float heading;
+  float pitch;
+  float roll;
+} motionVect;
+
+
 typedef struct drifterData{
   uint16_t ddYear;
   uint16_t ddMonth;
@@ -39,7 +46,7 @@ typedef struct drifterData{
   float ddSpeed;
   float ddCourse;
   float ddTemperature;
-  imuVect ddVect[VECT_COUNT];
+  motionVect ddVect[VECT_COUNT];
 } drifterData;
 
 #endif
