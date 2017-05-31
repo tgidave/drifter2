@@ -29,24 +29,44 @@ int imuPowerUp(void) {
 
 imuVect * getIMUPosition(void) {
 
+    int i;
   sensors_event_t event;
 
   bno.getEvent(&event);
-  imuOrient.heading = event.orientation.x;
   imuOrient.pitch = event.orientation.y;
   imuOrient.roll = event.orientation.z;
 
 #ifdef SERIAL_DEBUG_IMU
-  DEBUG_SERIAL.print("IMU Heading = ");
-  DEBUG_SERIAL.print(imuOrient.heading);
+//  DEBUG_SERIAL.print("IMU accelZ = ");
+//  DEBUG_SERIAL.print(imuOrient.heading);
   DEBUG_SERIAL.print(" pitch = ");
   DEBUG_SERIAL.print(imuOrient.pitch);
   DEBUG_SERIAL.print(" roll = ");
   DEBUG_SERIAL.print(imuOrient.roll);
-  DEBUG_SERIAL.print("\r\n");
 #endif
 
-  return(&imuOrient);
+#ifdef AVERAGE_ACCELZ
+  imuOrient.accelZ = 0;
+
+  for (i = 0; i < ACCELZ_AVG_SAMPLE_COUNT; ++i) {
+      imu::Vector<3> accel  = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+      imuOrient.accelZ += accel.z();
+      delay(ACCELZ_AVG_SAMPLERATE_DELAY_MS);
+  }
+
+  imuOrient.accelZ = imuOrient.accelZ / ACCELZ_AVG_SAMPLE_COUNT;
+#else
+  imu::Vector<3> accel  = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+  imuOrient.accelZ = accel.z();
+#endif
+
+#ifdef SERIAL_DEBUG_IMU
+  DEBUG_SERIAL.print(" accelZ = ");
+  DEBUG_SERIAL.print(imuOrient.accelZ);
+  DEBUG_SERIAL.print("\r\n"); 
+#endif
+
+  return (&imuOrient);
 }
 
 void imuPowerDown(void) {

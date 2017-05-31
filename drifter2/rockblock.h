@@ -10,8 +10,11 @@
 #define ROCKBLOCK_BAUD 19200
 #define ROCKBLOCK_POWER_PIN 5
 
-int transmitGPSFix(drifterData *, int);
-
+#ifdef SEND_2_RECORDS
+int transmitGPSFix(drifterData0 *, int, drifterData1 *, int);
+#else
+int transmitGPSFix(drifterData0 *, int);
+#endif
 #endif
 
 

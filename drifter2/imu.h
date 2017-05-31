@@ -4,12 +4,12 @@
 #define IMU_POWER_PIN 17
 
 /* Set the delay between fresh samples */
-#define BNO055_SAMPLERATE_DELAY_MS (1000)
+#define IMU_SAMPLERATE_DELAY_MS (100)
 
 typedef struct imuVect{
-  float heading;
-  float pitch;
-  float roll;
+    float pitch;
+    float roll;
+    float accelZ; 
 } imuVect;
 
 int imuPowerUp(void);

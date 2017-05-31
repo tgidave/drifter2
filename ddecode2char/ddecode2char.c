@@ -10,7 +10,7 @@ char buff[BUFFSIZE];
 
 drifterData dData;
 
-uint16_t convertStringToStruct(char* charPtr, char* binPtr);
+void convertStringToStruct(char* charPtr, char* binPtr);
 uint16_t convertCharToHex(char* ptr);
 
 int main(int argc, char** argv) {
@@ -48,15 +48,15 @@ int main(int argc, char** argv) {
   printf("temperature: %fC\r\n", dData.ddTemperature);
 
   for (i = 0; i < VECT_COUNT; ++i) {
-    printf("vect %02d: heading = %f pitch = %f roll = %f\r\n",
-           i,
-           dData.ddVect[i].heading,
-           dData.ddVect[i].pitch,
-           dData.ddVect[i].roll);
+      printf("vect %02d: pitch = %f roll = %f, accelZ = %f\r\n",
+             i,
+             dData.ddVect[i].pitch,
+             dData.ddVect[i].roll,
+             dData.ddVect[i].accelZ);
   }
 }
 
-uint16_t convertStringToStruct(char* charPtr, char* binPtr) {
+void convertStringToStruct(char* charPtr, char* binPtr) {
   char hByte0;
   char hByte1;
   int i = 0;
@@ -70,7 +70,6 @@ uint16_t convertStringToStruct(char* charPtr, char* binPtr) {
     *binPtr = (hByte0 << 4) | hByte1;
     ++binPtr;
   }
-
 }
 
 uint16_t convertCharToHex(char* ptr) {

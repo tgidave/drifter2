@@ -6,8 +6,11 @@
 
 IridiumSBD isbd(ROCKBLOCK_SERIAL, ROCKBLOCK_SLEEP_PIN);
 
-int transmitGPSFix(drifterData *ddPtr, int ddLen) {
-
+#ifdef SEND_2_RECORDS
+int transmitGPSFix(drifterData0 *ddPtr0, int ddLen0, drifterData1 *ddPtr1, int ddLen1) {
+#else
+int transmitGPSFix(drifterData0 *ddPtr0, int ddLen0) {
+#endif
   int rc;
 
   // Setup the RockBLOCK
@@ -30,27 +33,53 @@ int transmitGPSFix(drifterData *ddPtr, int ddLen) {
 
   if (isbd.begin() == ISBD_SUCCESS) {
 #ifdef SERIAL_DEBUG_ROCKBLOCK
-    DEBUG_SERIAL.flush();
-    DEBUG_SERIAL.print("Transmitting address=");
-    DEBUG_SERIAL.print((long)ddPtr);
-    DEBUG_SERIAL.print(" length=");
-    DEBUG_SERIAL.print(ddLen);
-    DEBUG_SERIAL.print("\r\n");
-
-    DEBUG_SERIAL.flush();
-#endif
-    rc = isbd.sendSBDBinary((const uint8_t *)ddPtr, ddLen);
-#ifdef SERIAL_DEBUG_ROCKBLOCK
-    DEBUG_SERIAL.flush();
-    if (rc == 0) {
-      DEBUG_SERIAL.print("Good return code from send!\r\n");
       DEBUG_SERIAL.flush();
-    } else {
-      DEBUG_SERIAL.print("Bad return code from send = ");
-      DEBUG_SERIAL.print(rc);
+      DEBUG_SERIAL.print("Transmitting address=");
+      DEBUG_SERIAL.print((long)ddPtr0);
+      DEBUG_SERIAL.print(" length=");
+      DEBUG_SERIAL.print(ddLen0);
       DEBUG_SERIAL.print("\r\n");
+
       DEBUG_SERIAL.flush();
-    }
+#endif
+      rc = isbd.sendSBDBinary((const uint8_t *)ddPtr0, ddLen0);
+#ifdef SERIAL_DEBUG_ROCKBLOCK
+      DEBUG_SERIAL.flush();
+      if (rc == 0) {
+          DEBUG_SERIAL.print("Good return code from send!\r\n");
+          DEBUG_SERIAL.flush();
+      } else {
+          DEBUG_SERIAL.print("Bad return code from send = ");
+          DEBUG_SERIAL.print(rc);
+          DEBUG_SERIAL.print("\r\n");
+          DEBUG_SERIAL.flush();
+      }
+#endif
+
+#ifdef SEND_2_RECORDS
+  #ifdef SERIAL_DEBUG_ROCKBLOCK
+      DEBUG_SERIAL.flush();
+      DEBUG_SERIAL.print("Transmitting address=");
+      DEBUG_SERIAL.print((long)ddPtr1);
+      DEBUG_SERIAL.print(" length=");
+      DEBUG_SERIAL.print(ddLen1);
+      DEBUG_SERIAL.print("\r\n");
+
+      DEBUG_SERIAL.flush();
+  #endif
+      rc = isbd.sendSBDBinary((const uint8_t *)ddPtr1, ddLen1);
+  #ifdef SERIAL_DEBUG_ROCKBLOCK
+      DEBUG_SERIAL.flush();
+      if (rc == 0) {
+          DEBUG_SERIAL.print("Good return code from send!\r\n");
+          DEBUG_SERIAL.flush();
+      } else {
+          DEBUG_SERIAL.print("Bad return code from send = ");
+          DEBUG_SERIAL.print(rc);
+          DEBUG_SERIAL.print("\r\n");
+          DEBUG_SERIAL.flush();
+      }
+  #endif
 #endif
   }
 

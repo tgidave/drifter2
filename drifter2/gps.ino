@@ -16,7 +16,7 @@ int getGPSFix(void) {
 //  int notAvailableCount;
   char outBuffer[OUTBUFFER_SIZE];
 
-  loopStartTime = millis();
+//  loopStartTime = millis();
 
   digitalWrite(GPS_POWER_PIN, HIGH);
   GPS_SERIAL.begin(GPS_BAUD);
