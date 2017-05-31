@@ -8,52 +8,69 @@
 
 char buff[BUFFSIZE];
 
-drifterData dData;
+drifterData0 dData0;
+drifterData1 dData1;
 
 void convertStringToStruct(char* charPtr, char* binPtr);
 uint16_t convertCharToHex(char* ptr);
 
-int main(int argc, char** argv) {
-  char* ptr = buff;
-  int i;
-  char buffHold;
-  int dataLen;
+int main(int argc, char **argv) {
+    char *ptr = buff;
+    int i;
+    char buffHold;
+    int dataLen;
 
-  if (argc != 2)  {
-    printf("Invalid number of arguments received!");
-    exit(1);
-  }
+    if (argc != 2)  {
+        printf("Invalid number of arguments received!");
+        exit(1);
+    }
 
-  if ((dataLen = strlen(argv[1])) != 672) {
-    printf("\r\nData invalid lentgh ");
-    printf("%d", dataLen);
-    printf(" should be 672!\r\n");
-    exit(1);
-  }
+    if ((dataLen = strlen(argv[1])) != 680) {
+        printf("\r\nData invalid lentgh ");
+        printf("%d", dataLen);
+        printf(" should be 672!\r\n");
+        exit(1);
+    }
 
-  convertStringToStruct(argv[1], (char*)&dData);
+    convertStringToStruct(argv[1], (char *)&dData0);
 
-  printf("%02d/%02d/%d %02d:%02d:%02d\r\n", 
-         dData.ddMonth, 
-         dData.ddDay, 
-         dData.ddYear,
-         dData.ddHour,
-         dData.ddMinute,
-         dData.ddSecond);
-  printf("latitude: %f\r\n", dData.ddLatitude);
-  printf("longitude: %f\r\n", dData.ddLongitude);
-  printf("altitude: %f\r\n", dData.ddAltitude);
-  printf("speed: %f\r\n", dData.ddSpeed);
-  printf("course: %f\r\n", dData.ddCourse);
-  printf("temperature: %fC\r\n", dData.ddTemperature);
+    if (dData0.ddRecordType == 0) {
+        printf("Sequence number %d Record type %d\r\n", dData0.ddSeqNbr, dData0.ddRecordType);
+        printf("%02d/%02d/%d %02d:%02d:%02d\r\n",
+               dData0.ddMonth,
+               dData0.ddDay,
+               dData0.ddYear,
+               dData0.ddHour,
+               dData0.ddMinute,
+               dData0.ddSecond);
+        printf("latitude: %f\r\n", dData0.ddLatitude);
+        printf("longitude: %f\r\n", dData0.ddLongitude);
+        printf("altitude: %f\r\n", dData0.ddAltitude);
+        printf("speed: %f\r\n", dData0.ddSpeed);
+        printf("course: %f\r\n", dData0.ddCourse);
+        printf("temperature: %fC\r\n", dData0.ddTemperature);
 
-  for (i = 0; i < VECT_COUNT; ++i) {
-      printf("vect %02d: pitch = %f roll = %f, accelZ = %f\r\n",
-             i,
-             dData.ddVect[i].pitch,
-             dData.ddVect[i].roll,
-             dData.ddVect[i].accelZ);
-  }
+        for (i = 0; i < VECT_COUNT_0; ++i) {
+            printf("vect %02d: pitch = %f roll = %f, accelZ = %f\r\n",
+                   i,
+                   dData0.ddVect[i].pitch,
+                   dData0.ddVect[i].roll,
+                   dData0.ddVect[i].accelZ);
+        }
+    } else {
+
+        convertStringToStruct(argv[1], (char *)&dData1);
+
+        printf("Sequence number %d Record type %d\r\n", dData1.ddSeqNbr, dData1.ddRecordType); 
+
+        for (i = 0; i < VECT_COUNT_1; ++i) {
+            printf("vect %02d: pitch = %f roll = %f, accelZ = %f\r\n",
+                   i,
+                   dData1.ddVect[i].pitch,
+                   dData1.ddVect[i].roll,
+                   dData1.ddVect[i].accelZ);
+        }
+    }
 }
 
 void convertStringToStruct(char* charPtr, char* binPtr) {
