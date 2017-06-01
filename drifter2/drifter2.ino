@@ -142,9 +142,13 @@ void loop() {
     ++noFixFoundCount;
   }
 
+#ifdef DISABLE_TEMP_SENSOR
+  ddData0.ddTemperature = 0;
+#else
   brIinitializeTemp();
   ddData0.ddTemperature = brGetCurrentTemp();
   brShutdownTemp();
+#endif
 
 #ifdef SERIAL_DEBUG_IMU
   DEBUG_SERIAL.print("Temperature = ");

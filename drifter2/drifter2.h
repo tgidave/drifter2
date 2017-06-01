@@ -39,6 +39,8 @@
   #define ALWAYS_TRANSMIT
 #endif
 
+//#define DISABLE_TEMP_SENSOR
+
 #define TRANSMIT_HOUR_1 0
 #define TRANSMIT_HOUR_2 6
 #define TRANSMIT_HOUR_3 12
