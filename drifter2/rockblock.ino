@@ -20,7 +20,20 @@ int transmitGPSFix(drifterData0 *ddPtr0, int ddLen0) {
 #endif
   isbd.setPowerProfile(1);
 
+#ifdef SERIAL_DEBUG_ROCKBLOCK
+  DEBUG_SERIAL.flush();
+  DEBUG_SERIAL.println("Powering up RockBLOCK");
+  DEBUG_SERIAL.flush();
+#endif
+
   digitalWrite(ROCKBLOCK_POWER_PIN, HIGH);
+
+#ifdef SERIAL_DEBUG_ROCKBLOCK
+  DEBUG_SERIAL.flush();
+  DEBUG_SERIAL.println("RockBLOCK powered up");
+  DEBUG_SERIAL.flush(); 
+#endif
+
   delay(1000);
   ROCKBLOCK_SERIAL.begin(ROCKBLOCK_BAUD);
   // Step 3: Start talking to the RockBLOCK and power it up
