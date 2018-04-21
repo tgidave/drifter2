@@ -26,7 +26,9 @@ int transmitGPSFix(drifterData0 *ddPtr0, int ddLen0) {
   DEBUG_SERIAL.flush();
 #endif
 
+#ifdef MANAGE_ROCKBLOCK_POWER
   digitalWrite(ROCKBLOCK_POWER_PIN, HIGH);
+#endif
 
 #ifdef SERIAL_DEBUG_ROCKBLOCK
   DEBUG_SERIAL.flush();
@@ -44,7 +46,7 @@ int transmitGPSFix(drifterData0 *ddPtr0, int ddLen0) {
 #endif
   //ROCKBLOCK_SERIAL.listen();
 
-  if (isbd.begin() == ISBD_SUCCESS) {
+  if ((rc =isbd.begin()) == ISBD_SUCCESS) {
 #ifdef SERIAL_DEBUG_ROCKBLOCK
       DEBUG_SERIAL.flush();
       DEBUG_SERIAL.print("Transmitting address=");
@@ -77,7 +79,6 @@ int transmitGPSFix(drifterData0 *ddPtr0, int ddLen0) {
       DEBUG_SERIAL.print(" length=");
       DEBUG_SERIAL.print(ddLen1);
       DEBUG_SERIAL.print("\r\n");
-
       DEBUG_SERIAL.flush();
   #endif
       rc = isbd.sendSBDBinary((const uint8_t *)ddPtr1, ddLen1);
@@ -94,11 +95,21 @@ int transmitGPSFix(drifterData0 *ddPtr0, int ddLen0) {
       }
   #endif
 #endif
+  } else {
+#ifdef SERIAL_DEBUG_ROCKBLOCK
+    DEBUG_SERIAL.print("Bad return code from begin = ");
+    DEBUG_SERIAL.print(rc);
+    DEBUG_SERIAL.print("\r\n");
+    DEBUG_SERIAL.flush();
+#endif
   }
 
   isbd.sleep();
   ROCKBLOCK_SERIAL.end();
+
+#ifdef MANAGE_ROCKBLOCK_POWER
   digitalWrite(ROCKBLOCK_POWER_PIN, LOW);
+#endif
   return (0);
 }
 

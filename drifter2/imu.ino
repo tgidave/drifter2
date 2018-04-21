@@ -51,7 +51,12 @@ imuVect * getIMUPosition(void) {
   for (i = 0; i < ACCELZ_AVG_SAMPLE_COUNT; ++i) {
       imu::Vector<3> accel  = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
       imuOrient.accelZ += accel.z();
-      delay(ACCELZ_AVG_SAMPLERATE_DELAY_MS);
+
+      if (ACCELZ_AVG_SAMPLERATE_DELAY_MS >= BNO055_SAMPLERATE_DELAY_MS) {
+          delay(ACCELZ_AVG_SAMPLERATE_DELAY_MS); 
+      } else {
+          delay(BNO055_SAMPLERATE_DELAY_MS);
+      }
   }
 
   imuOrient.accelZ = imuOrient.accelZ / ACCELZ_AVG_SAMPLE_COUNT;

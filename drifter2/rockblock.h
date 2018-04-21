@@ -8,7 +8,10 @@
 #define ROCKBLOCK_TX_PIN 8 // Pin marked TX on RockBlock
 #define ROCKBLOCK_SLEEP_PIN 6
 #define ROCKBLOCK_BAUD 19200
-#define ROCKBLOCK_POWER_PIN 5
+
+#ifdef MANAGE_ROCKBLOCK_POWER
+    #define ROCKBLOCK_POWER_PIN 5
+#endif
 
 #ifdef SEND_2_RECORDS
 int transmitGPSFix(drifterData0 *, int, drifterData1 *, int);

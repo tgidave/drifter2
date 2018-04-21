@@ -1,5 +1,7 @@
 #include "TSYS01.h"
-#include <i2c_t3.h>
+//#include <i2c_t3.h>
+#include <Wire.h>
+#include <WireKinetis.h>
 
 #define TSYS01_ADDR                        0x77  
 #define TSYS01_RESET                       0x1E

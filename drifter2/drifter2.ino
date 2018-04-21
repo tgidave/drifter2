@@ -1,3 +1,5 @@
+#include <Wire.h>
+#include <WireKinetis.h>
 
 //*****************************************************************************
 //
@@ -20,7 +22,7 @@
 #include <Time.h>
 #include <TimeAlarms.h>
 
-#include <i2c_t3.h>
+//#include <i2c_t3.h>
 
 //#include "atlastemp.h"
 #include "brtemp.h"
@@ -73,11 +75,13 @@ void setup() {
 
   seqNbr = 0;
 
-  pinMode(GPS_POWER_PIN, OUTPUT);
-  digitalWrite(GPS_POWER_PIN, LOW);
-
+#ifdef MANAGE_ROCKBLOCK_POWER
   pinMode(ROCKBLOCK_POWER_PIN, OUTPUT);
   digitalWrite(ROCKBLOCK_POWER_PIN, LOW);
+#endif
+
+  pinMode(GPS_POWER_PIN, OUTPUT);
+  digitalWrite(GPS_POWER_PIN, LOW);
 
   pinMode(IMU_POWER_PIN, OUTPUT);
   digitalWrite(IMU_POWER_PIN, LOW);
@@ -159,43 +163,44 @@ void loop() {
   if (imuPowerUp() == 0) {
 
     vectPtr = getIMUPosition(); //The first entry is always zeros so throw it away.
-    delay(IMU_SAMPLERATE_DELAY_MS * 10);
+    delay(IMU_SAMPLERATE_DELAY_MS);
 
 #ifdef SERIAL_DEBUG_IMU
     DEBUG_SERIAL.print("Record 0\r\n");
 #endif
+
     for (i = 0; i < VECT_COUNT_0; ++i) {
-      vectPtr = getIMUPosition();
-      ddData0.ddVect[i].pitch = vectPtr->pitch;
-      ddData0.ddVect[i].roll = vectPtr->roll;
-      ddData0.ddVect[i].accelZ = vectPtr->accelZ;
+        vectPtr = getIMUPosition();
+        ddData0.ddVect[i].pitch = vectPtr->pitch;
+        ddData0.ddVect[i].roll = vectPtr->roll;
+        ddData0.ddVect[i].accelZ = vectPtr->accelZ;
 
-      if (IMU_AVG_SAMPLERATE_DELAY_MS > 0) {
-        delay(IMU_AVG_SAMPLERATE_DELAY_MS);
+        if (IMU_AVG_SAMPLERATE_DELAY_MS > 0) {
+          delay(IMU_AVG_SAMPLERATE_DELAY_MS);
+        }
       }
-    }
 #ifdef SEND_2_RECORDS
-    ddData1.ddSeqNbr = seqNbr;
-    ddData1.ddRecordType = 1;
+      ddData1.ddSeqNbr = seqNbr;
+      ddData1.ddRecordType = 1;
 
 #ifdef SERIAL_DEBUG_IMU
-    DEBUG_SERIAL.print("Record 1\r\n");
+      DEBUG_SERIAL.print("Record 1\r\n");
 #endif
 
-    for (i = 0; i < VECT_COUNT_1; ++i) {
-      vectPtr = getIMUPosition();
-      ddData1.ddVect[i].pitch = vectPtr->pitch;
-      ddData1.ddVect[i].roll = vectPtr->roll;
-      ddData1.ddVect[i].accelZ = vectPtr->accelZ;
+      for (i = 0; i < VECT_COUNT_1; ++i) {
+          vectPtr = getIMUPosition();
+          ddData1.ddVect[i].pitch = vectPtr->pitch;
+          ddData1.ddVect[i].roll = vectPtr->roll;
+          ddData1.ddVect[i].accelZ = vectPtr->accelZ;
 
-      if (IMU_SAMPLERATE_DELAY_MS > 0) {
-        delay(IMU_AVG_SAMPLERATE_DELAY_MS);
+          if (IMU_SAMPLERATE_DELAY_MS > 0) {
+              delay(IMU_AVG_SAMPLERATE_DELAY_MS);
+          }
       }
-    }
 #endif
 
 #ifdef SERIAL_DEBUG_IMU
-  } else {
+    } else {
     DEBUG_SERIAL.print("No BNO055 detected ... Check your wiring or I2C ADDR!\r\n");
 #endif
   }
@@ -248,7 +253,7 @@ void loop() {
     nextTime += 60;
   }
 
-  alarm.setAlarm(0, nextTime, 0); // hour, min, sec
+  alarm.setAlarm(now() + (nextTime * 60));
 
 #ifdef SERIAL_DEBUG
   DEBUG_SERIAL.print("Will sleep for ");
